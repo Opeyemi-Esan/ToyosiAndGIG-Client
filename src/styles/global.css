@@ -1,0 +1,80 @@
+@import "tailwindcss";
+
+/* Dark mode is driven by a `dark` class on <html> (set by the theme switch) */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-brand-50: #fbf5e9;
+  --color-brand-100: #f3e4c1;
+  --color-brand-400: #d4a24a;
+  --color-brand-500: #b8862f;
+  --color-brand-600: #946a22;
+  --color-brand-700: #6f4f1a;
+  --color-ink: #14110f;
+}
+
+/* Semantic colours that change with the theme: use bg-bg, bg-surface, text-fg, text-muted, border-line, text-accent */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+}
+
+:root {
+  color-scheme: light;
+  --bg: #faf7f2;
+  --surface: #ffffff;
+  --fg: #1c1814;
+  --muted: #6b6258;
+  --line: rgb(28 24 20 / 0.12);
+  --accent: #946a22;
+}
+
+:root.dark {
+  color-scheme: dark;
+  --bg: #100e0c;
+  --surface: #1a1714;
+  --fg: #f5efe6;
+  --muted: #a39a8e;
+  --line: rgb(255 255 255 / 0.12);
+  --accent: #d4a24a;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+@utility container-x {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 72rem;
+  padding-inline: 1rem;
+  @media (min-width: 40rem) {
+    padding-inline: 1.5rem;
+  }
+  @media (min-width: 64rem) {
+    padding-inline: 2rem;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
