@@ -32,7 +32,7 @@ export default function GalleryPage() {
               aria-label={`Open ${photo.alt}`}
               className="mb-4 block w-full break-inside-avoid overflow-hidden rounded-xl border border-line"
             >
-              <img src={photo.url} alt={photo.alt} loading="lazy" className="w-full transition duration-300 hover:scale-105" />
+              <img src={photo.url} alt={photo.alt} loading="lazy" className="w-full transition cursor-pointer duration-300 hover:scale-105" />
             </button>
           ))}
         </div>

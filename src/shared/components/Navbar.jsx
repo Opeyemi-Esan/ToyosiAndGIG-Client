@@ -69,7 +69,7 @@ export default function Navbar() {
             aria-expanded={open}
             aria-controls="mobile-menu"
             aria-label={open ? 'Close menu' : 'Open menu'}
-            className="grid h-10 w-10 place-items-center rounded-full border border-line text-xl lg:hidden"
+            className="grid h-10 w-10 place-items-center rounded-full border border-line text-xl lg:hidden cursor-pointer"
           >
             <MenuIcon
               className={`col-start-1 row-start-1 transition duration-300 motion-reduce:transition-none ${open ? 'rotate-90 opacity-0' : 'rotate-0 opacity-100'}`}
