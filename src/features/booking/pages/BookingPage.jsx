@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../auth/hooks/useAuth'
 import { useCreateBooking } from '../hooks/useBooking'
@@ -7,7 +7,12 @@ import Button from '../../../shared/components/Button'
 import SectionHeading from '../../../shared/components/SectionHeading'
 import FormError from '../../../shared/components/FormError'
 import { FLYER_RULES, newIdempotencyKey } from '../../../shared/utils/security'
+import { formatDate } from '../../../shared/utils/format'
 
+// Step 1 of 3: details. Continue only shows a REVIEW screen: nothing is saved yet.
+// Step 2 of 3: review. "Confirm" saves the booking (unpaid) and moves on to the payment page.
+// "Back" returns to the form with everything still filled in.
+// No client-side validation: the backend DTO validates and its messages are shown as returned.
 const today = () => new Date().toISOString().slice(0, 10)
 
 export default function BookingPage() {
@@ -29,14 +34,35 @@ export default function BookingPage() {
   })
   const [flyer, setFlyer] = useState(null)
   const [formError, setFormError] = useState('')
+  const [step, setStep] = useState('form') // 'form' | 'review'
 
+  useEffect(() => {
+    window.scrollTo({ top: 0 })
+  }, [step])
+
+  // Same key for retries of this form: a timeout + retry can't create a second booking
   const bookingKey = useRef(newIdempotencyKey())
 
   const busy = createBooking.isPending
   const set = (name) => (e) => setValues((p) => ({ ...p, [name]: e.target.value }))
 
-  async function onSubmit(e) {
+  // Form -> review (nothing is sent to the backend yet)
+  function onContinue(e) {
     e.preventDefault()
+    setFormError('')
+    setStep('review')
+  }
+
+  // Review -> back to the form to edit. A new key, because the details may change.
+  function onBack() {
+    if (busy) return
+    setFormError('')
+    bookingKey.current = newIdempotencyKey()
+    setStep('form')
+  }
+
+  // Review -> save the booking, then payment
+  async function onConfirm() {
     if (busy) return
 
     setFormError('')
@@ -60,13 +86,17 @@ export default function BookingPage() {
   return (
     <section className="container-x py-12 sm:py-16">
       <SectionHeading
-        eyebrow="Book us · Step 1 of 2"
-        title="Tell us about your event"
-        subtitle="Fill in the details. On the next step you will pay a non-refundable booking fee to confirm your request."
+        eyebrow={step === 'form' ? 'Book us · Step 1 of 3' : 'Book us · Step 2 of 3'}
+        title={step === 'form' ? 'Tell us about your event' : 'Check your details'}
+        subtitle={
+          step === 'form'
+            ? 'Fill in the details. You can review everything before it is saved.'
+            : 'Make sure everything is correct. Nothing is saved until you confirm.'
+        }
       />
 
       <div className="mx-auto max-w-2xl">
-        {!isAuthenticated && (
+        {step === 'form' && !isAuthenticated && (
           <p className="mb-6 rounded-lg border border-line bg-surface p-3 text-sm text-muted">
             Booking as a guest. Have an account?{' '}
             <Link to="/login" state={{ from: '/book' }} className="font-semibold text-accent hover:underline">
@@ -76,7 +106,48 @@ export default function BookingPage() {
           </p>
         )}
 
-        <form onSubmit={onSubmit} noValidate className="space-y-4 rounded-2xl border border-line bg-surface p-5 sm:p-8">
+        {step === 'review' && (
+          <div className="space-y-5 rounded-2xl border border-line bg-surface p-5 sm:p-8">
+            <button
+              type="button"
+              onClick={onBack}
+              disabled={busy}
+              className="inline-flex items-center gap-2 text-sm font-semibold text-accent hover:underline disabled:opacity-50"
+            >
+              <span aria-hidden="true">←</span> Back to edit
+            </button>
+
+            <ReviewGroup title="Your details">
+              <Row label="Full name" value={values.customerName} />
+              <Row label="Phone" value={values.customerPhone} />
+              <Row label="Email" value={values.customerEmail} />
+            </ReviewGroup>
+
+            <ReviewGroup title="Event details">
+              <Row label="Event type" value={values.eventType} />
+              <Row label="Event date" value={values.eventDate ? formatDate(values.eventDate) : ''} />
+              <Row label="Country" value={values.eventCountry} />
+              <Row label="State" value={values.eventState} />
+              <Row label="Town / City" value={values.eventTownOrCity} />
+              <Row label="Venue" value={values.venue} />
+              <Row label="Notes" value={values.notes} />
+              <Row label="Event flyer" value={flyer?.name} />
+            </ReviewGroup>
+
+            <FormError message={formError} />
+
+            <div className="flex flex-col-reverse gap-3 sm:flex-row">
+              <Button type="button" variant="outline" size="lg" className="sm:flex-1" onClick={onBack} disabled={busy}>
+                Edit details
+              </Button>
+              <Button type="button" size="lg" className="sm:flex-1" loading={busy} onClick={onConfirm}>
+                Confirm &amp; continue to payment
+              </Button>
+            </div>
+          </div>
+        )}
+
+        <form hidden={step !== 'form'} onSubmit={onContinue} noValidate className="space-y-4 rounded-2xl border border-line bg-surface p-5 sm:p-8">
           <h2 className="text-lg font-bold">Your details</h2>
           <Input label="Full name" autoComplete="name" value={values.customerName} onChange={set('customerName')} />
           <div className="grid gap-4 sm:grid-cols-2">
@@ -104,13 +175,29 @@ export default function BookingPage() {
             hint="JPG, PNG or WebP"
           />
 
-          <FormError message={formError} />
-
-          <Button type="submit" size="lg" className="w-full" loading={busy}>
-            Continue
+          <Button type="submit" size="lg" className="w-full">
+            Review my booking
           </Button>
         </form>
       </div>
     </section>
+  )
+}
+
+function ReviewGroup({ title, children }) {
+  return (
+    <div>
+      <h2 className="text-lg font-bold">{title}</h2>
+      <dl className="mt-2 divide-y divide-line text-sm">{children}</dl>
+    </div>
+  )
+}
+
+function Row({ label, value }) {
+  return (
+    <div className="flex justify-between gap-4 py-2">
+      <dt className="text-muted">{label}</dt>
+      <dd className="min-w-0 break-words text-right font-medium">{value || <span className="text-muted">—</span>}</dd>
+    </div>
   )
 }
