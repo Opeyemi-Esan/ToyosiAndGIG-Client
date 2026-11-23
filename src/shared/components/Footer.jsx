@@ -10,8 +10,8 @@ export default function Footer() {
 
   return (
     <footer className="border-t border-line bg-surface">
-      <div className="container-x grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="lg:col-span-2">
+      <div className="container-x grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-3">
+        <div>
           <Link to="/" className="inline-flex items-center gap-3">
             <img src={logo} alt="" width="48" height="48" loading="lazy" className="h-12 w-12 rounded-full" />
             <span className="text-xl font-bold">{SITE.name}</span>
@@ -19,9 +19,10 @@ export default function Footer() {
           <p className="mt-4 max-w-sm text-sm text-muted">{SITE.tagline}.</p>
         </div>
 
-        <nav aria-label="Footer">
+        {/* Explore: centered in the middle, links in a grid */}
+        <nav aria-label="Footer" className="lg:text-center">
           <h2 className="text-sm font-semibold uppercase tracking-widest text-accent">Explore</h2>
-          <ul className="mt-4 space-y-2 text-sm">
+          <ul className="mt-4 lg:grid lg:grid-cols-3 gap-x-1 gap-y-2 text-sm [&>li:last-child:nth-child(3n+1)]:col-start-2">
             {NAV_LINKS.map((l) => (
               <li key={l.to}>
                 <Link to={l.to} className="text-muted hover:text-fg">

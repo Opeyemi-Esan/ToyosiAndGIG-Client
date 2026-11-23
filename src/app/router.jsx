@@ -29,6 +29,7 @@ export const router = createBrowserRouter([
           { path: 'book/payment', ...page(() => import('../features/payment/pages/PaymentPage')) },
           { path: 'booking/success', ...page(() => import('../features/booking/pages/BookingSuccessPage')) },
           // Set the backend's Paystack callback URL to https://YOUR-SITE/payment/success
+          { path: 'payment/callback', ...page(() => import('../features/payment/pages/PaymentSuccessPage')) },
           { path: 'payment/success', ...page(() => import('../features/payment/pages/PaymentSuccessPage')) },
           { path: 'payment/failed', ...page(() => import('../features/payment/pages/PaymentFailedPage')) },
 

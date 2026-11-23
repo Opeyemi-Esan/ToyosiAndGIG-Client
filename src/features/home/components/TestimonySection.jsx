@@ -1,5 +1,6 @@
 import { useTestimonies } from '../hooks/useTestimonies'
 import SectionHeading from '../../../shared/components/SectionHeading'
+import Reveal from '../../../shared/components/Reveal'
 import { QuoteIcon } from '../../../shared/components/Icons'
 
 // Shown ONLY while developing (npm run dev) so you can see the layout.
@@ -21,19 +22,21 @@ export default function TestimonySection() {
   return (
     <section className="py-16 sm:py-20">
       <div className="container-x">
-        <SectionHeading eyebrow="Testimonies" title="Kind words from our clients" />
+        <SectionHeading animate eyebrow="Testimonies" title="Kind words from our clients" />
         {usingSamples && <p className="-mt-6 mb-8 text-center text-xs text-muted">Development preview: sample content, hidden in production.</p>}
         <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {items.map((t) => (
-            <figure key={t.id} className="flex flex-col rounded-2xl border border-line bg-surface p-6">
-              <QuoteIcon className="text-3xl text-brand-500/60" />
-              {/* React escapes this text: never use dangerouslySetInnerHTML for API content */}
-              <blockquote className="mt-3 flex-1 leading-relaxed text-muted">{t.message}</blockquote>
-              <figcaption className="mt-5">
-                <p className="font-semibold">{t.name}</p>
-                {t.role && <p className="text-sm text-muted">{t.role}</p>}
-              </figcaption>
-            </figure>
+          {items.map((t, i) => (
+            <Reveal key={t.id} from={['left', 'up', 'right'][i % 3]} delay={(i % 3) * 120} className="h-full">
+              <figure className="flex h-full flex-col rounded-2xl border border-line bg-surface p-6">
+                <QuoteIcon className="text-3xl text-brand-500/60" />
+                {/* React escapes this text: never use dangerouslySetInnerHTML for API content */}
+                <blockquote className="mt-3 flex-1 leading-relaxed text-muted">{t.message}</blockquote>
+                <figcaption className="mt-5">
+                  <p className="font-semibold">{t.name}</p>
+                  {t.role && <p className="text-sm text-muted">{t.role}</p>}
+                </figcaption>
+              </figure>
+            </Reveal>
           ))}
         </div>
       </div>

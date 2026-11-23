@@ -1,6 +1,7 @@
 import { useSongs } from '../../music/hooks/useMusic'
 import SongPlayButton from '../../music/components/SongPlayButton'
 import SectionHeading from '../../../shared/components/SectionHeading'
+import Reveal from '../../../shared/components/Reveal'
 import { ExternalIcon } from '../../../shared/components/Icons'
 import { formatDate } from '../../../shared/utils/format'
 import logo from '../../../assets/images/logo.png'
@@ -31,14 +32,14 @@ export default function LatestSongSection() {
   return (
     <section className="py-16 sm:py-20">
       <div className="container-x">
-        <SectionHeading eyebrow="New release" title="Latest song" />
+        <SectionHeading animate eyebrow="New release" title="Latest song" />
         <div className="grid items-center gap-8 overflow-hidden rounded-3xl border border-line bg-surface p-6 md:grid-cols-2 md:gap-12 md:p-10">
-          <div className="relative mx-auto aspect-square w-full max-w-md overflow-hidden rounded-2xl bg-ink">
+          <Reveal from="left" className="relative mx-auto aspect-square w-full max-w-md overflow-hidden rounded-2xl bg-ink">
             <img src={song.coverUrl ?? logo} alt="" className={`h-full w-full ${song.coverUrl ? 'object-cover' : 'object-contain p-12'}`} />
             <span className="absolute left-4 top-4 rounded-full bg-brand-500 px-3 py-1 text-xs font-bold uppercase tracking-wider text-ink">New</span>
-          </div>
+          </Reveal>
 
-          <div className="text-center md:text-left">
+          <Reveal from="right" delay={150} className="text-center md:text-left">
             <h3 className="text-3xl font-bold sm:text-4xl">{song.title}</h3>
             <p className="mt-2 text-lg text-muted">
               {song.artist}
@@ -58,7 +59,7 @@ export default function LatestSongSection() {
                 </a>
               )}
             </div>
-          </div>
+          </Reveal>
         </div>
       </div>
     </section>

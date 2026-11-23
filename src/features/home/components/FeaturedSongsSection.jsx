@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { useSongs } from '../../music/hooks/useMusic'
 import SongGrid, { SongGridSkeleton } from '../../music/components/SongGrid'
 import SectionHeading from '../../../shared/components/SectionHeading'
+import Reveal from '../../../shared/components/Reveal'
 import Button from '../../../shared/components/Button'
 
 export default function FeaturedSongsSection() {
@@ -16,8 +17,14 @@ export default function FeaturedSongsSection() {
   return (
     <section className="bg-fg/[0.03] py-16 sm:py-20">
       <div className="container-x">
-        <SectionHeading eyebrow="Featured" title="Featured songs" subtitle="Fan favourites you can play right here." />
-        {isPending ? <SongGridSkeleton /> : <SongGrid songs={list} />}
+        <SectionHeading animate eyebrow="Featured" title="Featured songs" subtitle="Fan favourites you can play right here." />
+        {isPending ? (
+          <SongGridSkeleton />
+        ) : (
+          <Reveal>
+            <SongGrid songs={list} />
+          </Reveal>
+        )}
         <div className="mt-10 text-center">
           <Button as={Link} to="/music" variant="outline">
             View all music
