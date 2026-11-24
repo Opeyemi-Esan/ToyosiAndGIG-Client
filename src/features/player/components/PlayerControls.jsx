@@ -1,21 +1,39 @@
 import { usePlayerStore } from '../store/playerStore'
-import { MuteIcon, NextIcon, PauseIcon, PlayIcon, PrevIcon, VolumeIcon } from '../../../shared/components/Icons'
+import { MuteIcon, NextIcon, PauseIcon, PlayIcon, PrevIcon, RepeatIcon, ReplayIcon, VolumeIcon } from '../../../shared/components/Icons'
 import { formatTime } from '../../../shared/utils/format'
 
 const iconButton = 'grid h-9 w-9 place-items-center rounded-full text-xl transition hover:bg-fg/10 disabled:opacity-40'
 
-// Previous / play-pause / next + the seek bar
+// Repeat / previous / play-pause / next / replay + the seek bar
 export function TransportControls({ onPrevious, onSeek, hasNext }) {
   const isPlaying = usePlayerStore((s) => s.isPlaying)
   const currentTime = usePlayerStore((s) => s.currentTime)
   const duration = usePlayerStore((s) => s.duration)
   const toggle = usePlayerStore((s) => s.toggle)
   const next = usePlayerStore((s) => s.next)
+  const setPlaying = usePlayerStore((s) => s.setPlaying)
+  const repeat = usePlayerStore((s) => s.repeat)
+  const toggleRepeat = usePlayerStore((s) => s.toggleRepeat)
+  // Start the current song again from the beginning (also works after it has finished)
+  const replay = () => {
+    onSeek(0)
+    setPlaying(true)
+  }
   const safeDuration = Number.isFinite(duration) && duration > 0 ? duration : 0
 
   return (
     <div className="w-full">
       <div className="flex items-center justify-center gap-2">
+        <button
+          type="button"
+          onClick={toggleRepeat}
+          aria-label={repeat ? 'Turn repeat off' : 'Turn repeat on'}
+          aria-pressed={repeat}
+          title={repeat ? 'Repeat: on' : 'Repeat: off'}
+          className={`${iconButton} ${repeat ? 'bg-brand-500/20 text-accent' : ''}`}
+        >
+          <RepeatIcon />
+        </button>
         <button type="button" onClick={onPrevious} aria-label="Previous" className={iconButton}>
           <PrevIcon />
         </button>
@@ -29,6 +47,9 @@ export function TransportControls({ onPrevious, onSeek, hasNext }) {
         </button>
         <button type="button" onClick={next} disabled={!hasNext} aria-label="Next" className={iconButton}>
           <NextIcon />
+        </button>
+        <button type="button" onClick={replay} aria-label="Replay" title="Replay" className={iconButton}>
+          <ReplayIcon />
         </button>
       </div>
       <div className="mt-1 flex items-center gap-2 text-xs tabular-nums text-muted">

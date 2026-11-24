@@ -89,3 +89,29 @@ export const MusicIcon = (p) => (
     <circle cx="18" cy="16" r="3" />
   </svg>
 )
+export const ExpandIcon = (p) => (
+  <svg {...base} {...p}>
+    <path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5" />
+  </svg>
+)
+export const CollapseIcon = (p) => (
+  <svg {...base} {...p}>
+    <path d="M3 8h5V3M21 8h-5V3M3 16h5v5M21 16h-5v5" />
+  </svg>
+)
+export const ReplayIcon = (p) => (
+  <svg {...base} {...p}>
+    <path d="M3 12a9 9 0 1 0 3-6.7" />
+    <path d="M3 4v5h5" />
+  </svg>
+)
+export const RepeatIcon = (p) => (
+  <svg {...base} {...p}>
+    <path d="M17 2l4 4-4 4" />
+    <path d="M3 11V9a3 3 0 0 1 3-3h15" />
+    <path d="M7 22l-4-4 4-4" />
+    <path d="M21 13v2a3 3 0 0 1-3 3H3" />
+  </svg>
+)
+
+

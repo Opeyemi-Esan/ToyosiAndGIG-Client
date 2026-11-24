@@ -19,7 +19,11 @@ export const ENDPOINTS = {
     verify: '/api/Payment/verify', // GET ?reference=...
   },
   songs: {
-    list: '/api/songs',
+    list: '/api/Song/songs',
+    detail: (songId) => `/api/songs/${id(songId)}`,
+  },
+  featuredsongs: {
+    list: '/api/Song/featured-songs',
     detail: (songId) => `/api/songs/${id(songId)}`,
   },
   albums: {

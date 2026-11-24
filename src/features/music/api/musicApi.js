@@ -39,6 +39,11 @@ export async function getSongs(signal) {
   return data.map(normalizeSong)
 }
 
+export async function getFeaturedSongs(signal) {
+  const data = (await unwrap(await apiClient.get(ENDPOINTS.featuredsongs.list, { signal }))) ?? []
+  return data.map(normalizeSong)
+}
+
 export async function getSong(id, signal) {
   return normalizeSong(await unwrap(await apiClient.get(ENDPOINTS.songs.detail(id), { signal })))
 }

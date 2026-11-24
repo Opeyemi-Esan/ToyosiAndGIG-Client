@@ -8,6 +8,7 @@ export function usePlayer(mediaRef) {
   const isPlaying = usePlayerStore((s) => s.isPlaying)
   const volume = usePlayerStore((s) => s.volume)
   const muted = usePlayerStore((s) => s.muted)
+  const repeat = usePlayerStore((s) => s.repeat)
   const index = usePlayerStore((s) => s.index)
   const queueLength = usePlayerStore((s) => s.queue.length)
   const [failedId, setFailedId] = useState(null)
@@ -35,6 +36,11 @@ export function usePlayer(mediaRef) {
     media.volume = volume
     media.muted = muted
   }, [volume, muted, song, mediaRef])
+
+  // Repeat: the browser loops the current song by itself
+  useEffect(() => {
+    if (mediaRef.current) mediaRef.current.loop = repeat
+  }, [repeat, song, mediaRef])
 
   const mediaProps = {
     src: song?.mediaUrl ?? undefined,

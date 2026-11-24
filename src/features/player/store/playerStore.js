@@ -10,6 +10,8 @@ export const usePlayerStore = create((set, get) => ({
   currentTime: 0,
   duration: 0,
   videoOpen: true,
+  muted: false,
+  repeat: false, // keep repeating the current song   <-- add (below `muted: false,`)
 
   // Play `song`; `queue` lets next/previous move through the list it came from
   play: (song, queue) => {
@@ -34,6 +36,8 @@ export const usePlayerStore = create((set, get) => ({
   setDuration: (duration) => set({ duration }),
   toggleVideo: () => set((s) => ({ videoOpen: !s.videoOpen })),
   close: () => set({ queue: [], index: -1, isPlaying: false, currentTime: 0, duration: 0 }),
+  toggleMute: () => set((s) => ({ muted: !s.muted })),
+  toggleRepeat: () => set((s) => ({ repeat: !s.repeat })),   // <-- add (below toggleMute)
 }))
 
 export const selectCurrentSong = (s) => s.queue[s.index] ?? null
