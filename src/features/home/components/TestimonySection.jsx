@@ -6,9 +6,24 @@ import { QuoteIcon } from '../../../shared/components/Icons'
 // Shown ONLY while developing (npm run dev) so you can see the layout.
 // They never appear in a production build: real testimonies must come from your API.
 const DEV_SAMPLES = [
-  { id: 's1', name: 'Sample name', role: 'Wedding client', message: 'Sample testimony text to preview the layout. This placeholder is shown in development only.' },
-  { id: 's2', name: 'Sample name', role: 'Concert organiser', message: 'Sample testimony text to preview the layout. This placeholder is shown in development only.' },
-  { id: 's3', name: 'Sample name', role: 'Private event client', message: 'Sample testimony text to preview the layout. This placeholder is shown in development only.' },
+  {
+  id: 's1',
+  name: 'Sarah & Michael',
+  role: 'Wedding client',
+  message: 'Honestly, we couldn’t have asked for a better experience. Everything was beautifully captured, and the videos brought back so many emotions. We are grateful to have these memories to look back on for years to come.'
+},
+{
+  id: 's2',
+  name: 'Grace & Daniel',
+  role: 'Wedding client',
+  message: 'From the very first conversation, we knew we were in good hands. The team was professional, friendly, and paid attention to every little detail. Looking through our pictures and videos feels like reliving our wedding day all over again.'
+},
+{
+  id: 's3',
+  name: 'Chisom & David',
+  role: 'Wedding client',
+  message: 'They did an amazing job capturing our special day. We barely noticed the cameras, but somehow they captured every important moment, from the laughter to the emotional moments. We absolutely love the final result and would recommend them to anyone.'
+}
 ]
 
 export default function TestimonySection() {

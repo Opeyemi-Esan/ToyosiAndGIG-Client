@@ -17,15 +17,16 @@ function ScrollToTop() {
 const MainLayout = () => {
   const playerActive = usePlayerStore((s) => s.index >= 0)
 
-  return (
-    <>
+    return (
+    // Column that is at least one screen tall: <main> grows to fill, so the footer always sits at the bottom
+    <div className="flex min-h-dvh flex-col">
       <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[200] focus:rounded-lg focus:bg-brand-500 focus:px-4 focus:py-2 focus:text-ink">
         Skip to content
       </a>
       <ScrollToTop />
       <Navbar />
 
-      <main id="main" className="min-h-[60vh]">
+      <main id="main" className="flex-1">
         <Outlet />
       </main>
 
@@ -33,7 +34,7 @@ const MainLayout = () => {
       {/* Keep the footer reachable above the fixed player */}
       {playerActive && <div aria-hidden="true" className="h-32 sm:h-24" />}
       <MusicPlayer />
-    </>
+    </div>
   )
 }
 

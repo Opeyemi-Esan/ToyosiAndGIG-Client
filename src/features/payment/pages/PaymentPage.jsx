@@ -25,7 +25,8 @@ export default function PaymentPage() {
     e.preventDefault()
     if (busy) return
     // Not blocked on the client: if the box is unticked, the backend's own message is shown
-    pay.mutate({ bookingReference, acceptedNonRefundable: accepted, idempotencyKey: newIdempotencyKey() })
+    //pay.mutate({ bookingReference, acceptedNonRefundable: accepted, idempotencyKey: newIdempotencyKey() })
+    pay.mutate({ bookingReference, acceptedNonRefundable: accepted, idempotencyKey: newIdempotencyKey(), summary })
   }
 
   return (

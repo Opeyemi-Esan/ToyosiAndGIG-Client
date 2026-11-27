@@ -12,7 +12,19 @@ import { formatDate } from '../../../shared/utils/format'
 // Step 1 of 3: details. Continue only shows a REVIEW screen: nothing is saved yet.
 // Step 2 of 3: review. "Confirm" saves the booking (unpaid) and moves on to the payment page.
 // "Back" returns to the form with everything still filled in.
-// No client-side validation: the backend DTO validates and its messages are shown as returned.
+// Required fields are checked here first (an error shows under each empty field and nothing moves on);
+// everything else is validated by the backend DTO and its messages are shown as returned.
+const REQUIRED = {
+  customerName: 'Full name',
+  customerPhone: 'Phone number',
+  customerEmail: 'Email',
+  eventType: 'Event type',
+  eventDate: 'Event date',
+  eventCountry: 'Country',
+  eventState: 'State',
+  eventTownOrCity: 'Town / City',
+}
+
 const today = () => new Date().toISOString().slice(0, 10)
 
 export default function BookingPage() {
@@ -34,6 +46,7 @@ export default function BookingPage() {
   })
   const [flyer, setFlyer] = useState(null)
   const [formError, setFormError] = useState('')
+  const [errors, setErrors] = useState({}) // { fieldName: 'message' }
   const [step, setStep] = useState('form') // 'form' | 'review'
 
   useEffect(() => {
@@ -44,12 +57,30 @@ export default function BookingPage() {
   const bookingKey = useRef(newIdempotencyKey())
 
   const busy = createBooking.isPending
-  const set = (name) => (e) => setValues((p) => ({ ...p, [name]: e.target.value }))
+  const set = (name) => (e) => {
+    setValues((p) => ({ ...p, [name]: e.target.value }))
+    if (errors[name]) setErrors((p) => ({ ...p, [name]: '' })) // clear the error as soon as they type
+  }
 
   // Form -> review (nothing is sent to the backend yet)
   function onContinue(e) {
     e.preventDefault()
     setFormError('')
+
+    // Block the step if any required field is empty
+    const found = {}
+    for (const [name, label] of Object.entries(REQUIRED)) {
+      if (!String(values[name] ?? '').trim()) found[name] = `${label} is required`
+    }
+    setErrors(found)
+
+    const firstInvalid = Object.keys(found)[0]
+    if (firstInvalid) {
+      // Take the person to the first problem
+      document.getElementById(`field-${firstInvalid}`)?.focus()
+      return
+    }
+
     setStep('review')
   }
 
@@ -75,7 +106,19 @@ export default function BookingPage() {
       navigate('/book/payment', {
         state: {
           bookingReference,
-          summary: { name: values.customerName, eventType: values.eventType, eventDate: values.eventDate },
+          // summary: { name: values.customerName, eventType: values.eventType, eventDate: values.eventDate },
+          summary: {
+            name: values.customerName,
+            phone: values.customerPhone,
+            email: values.customerEmail,
+            eventType: values.eventType,
+            eventDate: values.eventDate,
+            country: values.eventCountry,
+            state: values.eventState,
+            town: values.eventTownOrCity,
+            venue: values.venue,
+            notes: values.notes,
+          },
         },
       })
     } catch (err) {
@@ -149,21 +192,21 @@ export default function BookingPage() {
 
         <form hidden={step !== 'form'} onSubmit={onContinue} noValidate className="space-y-4 rounded-2xl border border-line bg-surface p-5 sm:p-8">
           <h2 className="text-lg font-bold">Your details</h2>
-          <Input label="Full name" autoComplete="name" value={values.customerName} onChange={set('customerName')} />
+          <Input required label="Full name" id="field-customerName" error={errors.customerName} autoComplete="name" value={values.customerName} onChange={set('customerName')} />
           <div className="grid gap-4 sm:grid-cols-2">
-            <Input label="Phone number" type="tel" autoComplete="tel" value={values.customerPhone} onChange={set('customerPhone')} />
-            <Input label="Email" type="email" autoComplete="email" value={values.customerEmail} onChange={set('customerEmail')} />
+            <Input required label="Phone number" id="field-customerPhone" error={errors.customerPhone} type="tel" autoComplete="tel" value={values.customerPhone} onChange={set('customerPhone')} />
+            <Input required label="Email" id="field-customerEmail" error={errors.customerEmail} type="email" autoComplete="email" value={values.customerEmail} onChange={set('customerEmail')} />
           </div>
 
           <h2 className="pt-2 text-lg font-bold">Event details</h2>
           <div className="grid gap-4 sm:grid-cols-2">
-            <Input label="Event type" placeholder="Wedding, concert…" value={values.eventType} onChange={set('eventType')} />
-            <Input label="Event date" type="date" min={today()} value={values.eventDate} onChange={set('eventDate')} />
+            <Input required label="Event type" id="field-eventType" error={errors.eventType} placeholder="Wedding, concert…" value={values.eventType} onChange={set('eventType')} />
+            <Input required label="Event date" id="field-eventDate" error={errors.eventDate} type="date" min={today()} value={values.eventDate} onChange={set('eventDate')} />
           </div>
           <div className="grid gap-4 sm:grid-cols-3">
-            <Input label="Country" autoComplete="country-name" value={values.eventCountry} onChange={set('eventCountry')} />
-            <Input label="State" value={values.eventState} onChange={set('eventState')} />
-            <Input label="Town / City" value={values.eventTownOrCity} onChange={set('eventTownOrCity')} />
+            <Input required label="Country" id="field-eventCountry" error={errors.eventCountry} autoComplete="country-name" value={values.eventCountry} onChange={set('eventCountry')} />
+            <Input required label="State" id="field-eventState" error={errors.eventState} value={values.eventState} onChange={set('eventState')} />
+            <Input required label="Town / City" id="field-eventTownOrCity" error={errors.eventTownOrCity} value={values.eventTownOrCity} onChange={set('eventTownOrCity')} />
           </div>
           <Input label="Venue (optional)" value={values.venue} onChange={set('venue')} />
           <Input label="Notes (optional)" multiline rows={3} value={values.notes} onChange={set('notes')} />

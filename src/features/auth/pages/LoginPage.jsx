@@ -10,7 +10,8 @@ export default function LoginPage() {
   const { isAuthenticated, login } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
-  const redirectTo = safeRedirect(location.state?.from)
+  //const redirectTo = safeRedirect(location.state?.from)
+  const redirectTo = location.state?.from ? safeRedirect(location.state.from) : '/dashboard'
 
   const [values, setValues] = useState({ email: '', password: '' })
 
@@ -32,6 +33,13 @@ export default function LoginPage() {
         <Input label="Email" type="email" autoComplete="email" maxLength={254} value={values.email} onChange={set('email')} />
         <Input label="Password" type="password" autoComplete="current-password" maxLength={128} value={values.password} onChange={set('password')} />
         <FormError message={login.error?.message} />
+        {/confirm/i.test(login.error?.message ?? '') && (
+          <p className="text-center text-sm">
+            <Link to="/confirm-email" state={{ email: values.email }} className="font-semibold text-accent hover:underline">
+              Enter your confirmation code
+            </Link>
+          </p>
+        )}
         <Button type="submit" className="w-full" loading={login.isPending}>
           Sign in
         </Button>

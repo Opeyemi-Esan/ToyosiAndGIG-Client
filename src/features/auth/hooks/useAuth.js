@@ -2,24 +2,19 @@ import { useEffect } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAuthStore } from '../store/authStore'
 import * as authApi from '../api/authApi'
+import { refreshSession } from '../../../services/apiClient'
 
 const USE_COOKIE_SESSION = import.meta.env.VITE_API_WITH_CREDENTIALS === 'true'
 
 // Call once at the app root: restores the session from the httpOnly refresh cookie (if enabled)
 export function useSessionBootstrap() {
   useEffect(() => {
-    const { setSession, setReady } = useAuthStore.getState()
+    const { setReady } = useAuthStore.getState()
     if (!USE_COOKIE_SESSION) {
       setReady()
       return
     }
-    authApi
-      .refresh()
-      .then((session) => session?.accessToken && setSession(session))
-      .catch(() => {
-        /* not signed in: that's fine */
-      })
-      .finally(setReady)
+    refreshSession().finally(setReady) // refreshSession stores the session itself
   }, [])
 }
 

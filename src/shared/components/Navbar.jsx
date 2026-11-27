@@ -28,7 +28,8 @@ export default function Navbar() {
     return () => window.removeEventListener('keydown', onKey)
   }, [open])
 
-  const accountLink = isAuthenticated ? { to: '/profile', label: 'Profile' } : { to: '/login', label: 'Login' }
+  //const accountLink = isAuthenticated ? { to: '/profile', label: 'Profile' } : { to: '/login', label: 'Login' }
+  const accountLink = isAuthenticated ? { to: '/dashboard', label: 'Dashboard' } : { to: '/login', label: 'Login' }
 
   // Each item fades and slides in one after another when the menu opens
   const items = [...NAV_LINKS, accountLink]

@@ -1,8 +1,11 @@
 import axios from 'axios'
 import { useAuthStore } from '../features/auth/store/authStore'
+import { toSession } from '../features/auth/api/session'
 import { useBusyStore } from './busyStore'
+import { ENDPOINTS } from './endpoints'
 
 const baseURL = import.meta.env.VITE_API_BASE_URL
+const USE_COOKIE_SESSION = import.meta.env.VITE_API_WITH_CREDENTIALS === 'true'
 
 if (!baseURL && import.meta.env.PROD) {
   throw new Error('VITE_API_BASE_URL is not set')
@@ -53,8 +56,38 @@ const apiClient = axios.create({
   baseURL: baseURL || 'https://localhost:7060',
   timeout: 20000,
   headers: { Accept: 'application/json' },
-  withCredentials: import.meta.env.VITE_API_WITH_CREDENTIALS === 'true',
+  withCredentials: USE_COOKIE_SESSION,
 })
+
+// ---- Session refresh -------------------------------------------------------------------------
+// Uses a plain axios call (not apiClient) so it can never trigger its own 401 handling.
+// ONE shared promise: if several callers ask at once (page load in dev mode, many requests
+// expiring together) they all wait for the same request. The backend rotates the refresh
+// token on every use, so two parallel refreshes would otherwise invalidate each other.
+let refreshPromise = null
+
+export function refreshSession() {
+  if (!USE_COOKIE_SESSION) return Promise.resolve(null)
+
+  if (!refreshPromise) {
+    refreshPromise = axios
+      .post(`${apiClient.defaults.baseURL}${ENDPOINTS.auth.refresh}`, null, {
+        withCredentials: true,
+        timeout: 20000,
+        headers: { Accept: 'application/json' },
+      })
+      .then((res) => {
+        const session = toSession(res.data?.data)
+        if (session) useAuthStore.getState().setSession(session)
+        return session
+      })
+      .catch(() => null) // no valid refresh cookie: the caller treats this as signed out
+      .finally(() => {
+        refreshPromise = null
+      })
+  }
+  return refreshPromise
+}
 
 // Attach the in-memory access token and start the busy indicator.
 // Pass { silent: true } in a request config to skip the busy overlay (background calls).
@@ -87,7 +120,7 @@ apiClient.interceptors.response.use(
     }
     return res
   },
-  (error) => {
+  async (error) => {
     stopBusy(error.config)
 
     if (axios.isCancel(error)) return Promise.reject(error)
@@ -96,9 +129,29 @@ apiClient.interceptors.response.use(
     if (!error.response) {
       return Promise.reject(new ApiError('Network error. Please check your connection and try again.'))
     }
-    if (status === 401 && useAuthStore.getState().accessToken) {
-      useAuthStore.getState().clearSession()
+
+    // Expired access token: refresh once, then repeat the original request with the new token.
+    const original = error.config
+    const store = useAuthStore.getState()
+    const isAuthCall = String(original?.url ?? '').includes('/api/auth/')
+
+    if (status === 401 && store.accessToken && original && !original._retried && !isAuthCall) {
+      original._retried = true
+
+      // Another request already refreshed while this one was in flight: just retry with the new token
+      const sentWith = original.headers?.Authorization
+      if (sentWith && sentWith !== `Bearer ${store.accessToken}`) {
+        return apiClient(original)
+      }
+
+      const session = await refreshSession()
+      if (session?.accessToken) return apiClient(original)
+
+      useAuthStore.getState().clearSession() // refresh failed: really signed out
+    } else if (status === 401 && store.accessToken) {
+      store.clearSession()
     }
+
     // Show the backend's own message exactly as it sends it. Your API already returns safe
     // messages (Response<T>.Fail and the global exception handler), so there is nothing to hide.
     // Only when the backend sends no readable message do we use a generic fallback.

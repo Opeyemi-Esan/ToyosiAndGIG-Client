@@ -31,16 +31,20 @@
   --muted: #6b6258;
   --line: rgb(28 24 20 / 0.12);
   --accent: #946a22;
+  --ring-fill: rgba(113, 134, 151, 0.03);
+  --ring-line: rgba(130, 148, 153, 0.08);
 }
 
 :root.dark {
   color-scheme: dark;
-  --bg: #100e0c;
-  --surface: #1a1714;
+  --bg: #0c0f10;
+  --surface: #17191a;
   --fg: #f5efe6;
   --muted: #a39a8e;
-  --line: rgb(255 255 255 / 0.12);
+  --line: rgba(255, 255, 255, 0.12);
   --accent: #d4a24a;
+  --ring-fill: rgba(202, 206, 207, 0.012);
+  --ring-line: rgba(195, 197, 199, 0.06);
 }
 
 html {
@@ -63,6 +67,36 @@ body {
   overflow-x: clip;
 }
 
+
+/* Concentric-circle pattern behind every page. Fixed, so it stays put while the page scrolls;
+   it sits under all content, and sections with a transparent background let it show through.
+   --u is the ring size unit: smaller on phones so the pattern doesn't swamp the screen. */
+body::before {
+  --u: 1rem;
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  /* Two outer rings per corner; the core circle inside them is left fully transparent */
+  background-image:
+    radial-gradient(circle at 92% 4%, transparent calc(22 * var(--u) - 1px), var(--ring-line) calc(22 * var(--u) - 1px) calc(22 * var(--u)), transparent calc(22 * var(--u))),
+    radial-gradient(circle at 92% 4%, transparent calc(16 * var(--u) - 1px), var(--ring-line) calc(16 * var(--u) - 1px) calc(16 * var(--u)), transparent calc(16 * var(--u))),
+    radial-gradient(circle at 92% 4%, transparent calc(10 * var(--u)), var(--ring-fill) calc(10 * var(--u)) calc(16 * var(--u)), transparent calc(16 * var(--u))),
+    radial-gradient(circle at 92% 4%, transparent calc(16 * var(--u)), var(--ring-fill) calc(16 * var(--u)) calc(22 * var(--u)), transparent calc(22 * var(--u))),
+    radial-gradient(circle at 4% 96%, transparent calc(19 * var(--u) - 1px), var(--ring-line) calc(19 * var(--u) - 1px) calc(19 * var(--u)), transparent calc(19 * var(--u))),
+    radial-gradient(circle at 4% 96%, transparent calc(14 * var(--u) - 1px), var(--ring-line) calc(14 * var(--u) - 1px) calc(14 * var(--u)), transparent calc(14 * var(--u))),
+    radial-gradient(circle at 4% 96%, transparent calc(8 * var(--u)), var(--ring-fill) calc(8 * var(--u)) calc(14 * var(--u)), transparent calc(14 * var(--u))),
+    radial-gradient(circle at 4% 96%, transparent calc(14 * var(--u)), var(--ring-fill) calc(14 * var(--u)) calc(19 * var(--u)), transparent calc(19 * var(--u)));
+}
+
+@media (max-width: 40rem) {
+  body::before {
+    --u: 0.55rem;
+  }
+}
+
+
 @utility container-x {
   margin-inline: auto;
   width: 100%;
@@ -79,4 +113,33 @@ body {
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
+}
+
+
+@keyframes confetti-fall {
+  0%   { transform: translate3d(0, -10vh, 0) rotate(0deg); opacity: 1; }
+  100% { transform: translate3d(var(--drift, 0px), 110vh, 0) rotate(720deg); opacity: 0.9; }
+}
+
+@keyframes splash-pop {
+  0%   { transform: scale(0.7); opacity: 0; }
+  100% { transform: scale(1);   opacity: 1; }
+}
+
+.confetti-piece {
+  position: absolute;
+  top: 0;
+  animation-name: confetti-fall;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+.splash-card {
+  animation: splash-pop 0.35s ease-out;
+}
+
+/* Respect users who turn off motion in their OS */
+@media (prefers-reduced-motion: reduce) {
+  .confetti-piece { display: none; }
+  .splash-card { animation: none; }
 }

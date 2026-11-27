@@ -1,6 +1,7 @@
 // Edit these values: they feed the navbar, footer and contact page.
 export const SITE = {
   name: 'Toyosi & GIG',
+  heroname: 'Toyosi & Gang In Groove',
   tagline: 'Live music for your unforgettable moments',
   // Leave empty to hide. Fill in real details before going live.
   email: '',
@@ -20,7 +21,7 @@ export const NAV_LINKS = [
   { to: '/about', label: 'About' },
   { to: '/services', label: 'Services' },
   { to: '/music', label: 'Music' },
-  { to: '/videos', label: 'Videos' },
+  { to: '/videos', label: 'Owanbe' },
   { to: '/gallery', label: 'Gallery' },
   { to: '/contact', label: 'Contact' },
 ]

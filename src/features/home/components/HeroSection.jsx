@@ -27,14 +27,14 @@ export default function HeroSection() {
         <source src={heroMp4} type="video/mp4" />
       </video>
 
-      <div aria-hidden="true" className="absolute inset-0 -z-10 bg-gradient-to-t from-ink via-ink/60 to-ink/40" />
+      <div aria-hidden="true" className="absolute inset-0 -z-10 bg-linear-to-t from-ink via-ink/60 to-ink/40" />
 
       <div className="container-x py-24 text-center sm:py-32">
         <Reveal as="p" from="down" className="text-sm font-semibold uppercase tracking-[0.3em] text-brand-400">
           Live music
         </Reveal>
         <Reveal as="h1" from="left" delay={150} className="mt-4 text-4xl font-extrabold tracking-tight drop-shadow sm:text-6xl lg:text-7xl">
-          {SITE.name}
+          {SITE.heroname}
         </Reveal>
         <Reveal as="p" from="right" delay={300} className="mx-auto mt-5 max-w-xl text-base text-stone-200 sm:text-xl">
           {SITE.tagline}

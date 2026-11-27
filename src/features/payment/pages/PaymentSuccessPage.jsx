@@ -22,7 +22,8 @@ export default function PaymentSuccessPage() {
   }, [])
 
   if (!isValidReference(reference)) return <Navigate to="/payment/failed" replace />
-  if (data && isPaidResult(data)) return <Navigate to="/booking/success" replace state={{ paid: true, reference }} />
+  //if (data && isPaidResult(data)) return <Navigate to="/booking/success" replace state={{ paid: true, reference }} />
+  if (data && isPaidResult(data)) return <Navigate to="/booking/success" replace state={{ paid: true, reference, amount: data.amount ?? data.Amount ?? null }} />
   if (data && isFailedResult(data)) return <Navigate to="/payment/failed" replace state={{ reference }} />
 
   // Not confirmed yet (the webhook can take a moment) or the status check itself failed

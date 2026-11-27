@@ -4,7 +4,7 @@ import { PauseIcon, PlayIcon } from '../../../shared/components/Icons'
 
 // Play/pause button for a song. Renders nothing if the song has no playable file.
 // `queue` = the list the song came from, so Next/Previous work in the player.
-export default function SongPlayButton({ song, queue, variant = 'primary', size = 'md', className = '' }) {
+export default function SongPlayButton({ song, queue, variant = 'primary', size = 'md', className = 'cursor-pointer' }) {
   const current = usePlayerStore(selectCurrentSong)
   const isPlaying = usePlayerStore((s) => s.isPlaying)
   const play = usePlayerStore((s) => s.play)

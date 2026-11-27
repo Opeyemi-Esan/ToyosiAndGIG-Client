@@ -3,6 +3,7 @@ import MainLayout from './layouts/MainLayout'
 import AuthLayout from './layouts/AuthLayout'
 import ProtectedRoute from '../features/auth/components/ProtectedRoute'
 import { PageLoader } from '../shared/components/Loader'
+import { Navigate } from 'react-router-dom'
 
 // Every page is loaded on demand (code splitting), so the first visit downloads only what it needs.
 const page = (importer) => ({
@@ -35,7 +36,8 @@ export const router = createBrowserRouter([
 
           {
             element: <ProtectedRoute />,
-            children: [{ path: 'profile', ...page(() => import('../features/profile/pages/ProfilePage')) }],
+            children: [{ path: 'profile', element: <Navigate to="/dashboard/profile" replace /> }],
+            //children: [{ path: 'profile', ...page(() => import('../features/profile/pages/ProfilePage')) }],
           },
 
           { path: '*', ...page(() => import('../features/home/pages/NotFoundPage')) },
@@ -46,6 +48,23 @@ export const router = createBrowserRouter([
         children: [
           { path: 'login', ...page(() => import('../features/auth/pages/LoginPage')) },
           { path: 'register', ...page(() => import('../features/auth/pages/RegisterPage')) },
+          { path: 'confirm-email', ...page(() => import('../features/auth/pages/ConfirmEmailPage')) },
+        ],
+      },
+      {
+        element: <ProtectedRoute />,
+        children: [
+          {
+            path: 'dashboard',
+            ...page(() => import('../features/dashboard/layout/DashboardLayout')),
+            children: [
+              { index: true, ...page(() => import('../features/dashboard/pages/DashboardHome')) },
+              { path: 'bookings', ...page(() => import('../features/dashboard/pages/BookingsPage')) },
+              { path: 'status', ...page(() => import('../features/dashboard/pages/BookingStatusPage')) },
+              { path: 'profile', ...page(() => import('../features/dashboard/pages/ProfilePage')) },
+              { path: 'rewards', ...page(() => import('../features/dashboard/pages/RewardsPage')) },
+            ],
+          },
         ],
       },
     ],

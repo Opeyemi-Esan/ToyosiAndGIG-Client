@@ -8,6 +8,15 @@ export const ENDPOINTS = {
     logout: '/api/auth/logout',
     refresh: '/api/auth/refresh-token',
   },
+  account: { 
+    confirmEmail: '/api/account/confirm-email', 
+    sendConfirmation: '/api/account/send-confirmation' 
+  },
+  dashboard: { 
+    summary: '/api/dashboard/summary', 
+    bookings: '/api/dashboard/bookings' 
+  },
+  profilePicture: '/api/profile/picture',
   profile: '/api/profile',
   bookings: {
     create: '/api/booking/create-booking',
@@ -29,6 +38,12 @@ export const ENDPOINTS = {
   albums: {
     list: '/api/albums',
     detail: (albumId) => `/api/albums/${id(albumId)}`,
+  },
+   owanbe: {
+    list: '/api/Owanbe/get-owanbe', // GET ?category=Highlights&take=4 (both optional)
+  },
+   gallery: {
+    list: '/api/Gallery/get-gallery', // GET ?mediaType=Image|Video&pageNumber=1&pageSize=12
   },
   testimonies: '/api/testimonies',
   contact: '/api/contact',

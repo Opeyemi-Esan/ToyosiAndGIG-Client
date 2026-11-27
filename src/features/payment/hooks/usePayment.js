@@ -1,8 +1,9 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
 import * as paymentApi from '../api/paymentApi'
 import { isValidReference, safePaymentUrl } from '../../../shared/utils/security'
+import { saveReceipt } from '../../booking/utils/bookingReceipt'
 
-// The fee to display, read from the backend
+// The fee to display, read from the backend (cached, so every page shares one request)
 export function useBookingFee() {
   return useQuery({
     queryKey: ['payment', 'booking-fee'],
@@ -14,17 +15,21 @@ export function useBookingFee() {
 // Gets the Paystack checkout link and sends the browser there
 export function useInitializePayment() {
   return useMutation({
-    mutationFn: async ({ bookingReference, acceptedNonRefundable, idempotencyKey }) => {
+    mutationFn: async ({ bookingReference, acceptedNonRefundable, idempotencyKey, summary }) => {
       const data = await paymentApi.initializePayment({ bookingReference, acceptedNonRefundable }, idempotencyKey)
       const url = safePaymentUrl(paymentApi.extractCheckoutUrl(data)) // only checkout.paystack.com is allowed
       if (!url) throw new Error('Could not start payment. Please try again.')
+
+      // Remember the booking details so the success page can show them when Paystack sends the customer back
+      saveReceipt(data?.reference ?? data?.Reference, { bookingReference, summary })
       return url
     },
     onSuccess: (url) => window.location.assign(url),
   })
 }
 
-// Keeps checking for about 30s in case the webhook arrives a moment after the customer returns
+// Checks the payment status, and keeps checking every few seconds (about 30s) because the
+// Paystack webhook can arrive a moment after the customer is sent back to the site.
 export function useVerifyPayment(reference) {
   return useQuery({
     queryKey: ['payment', 'verify', reference],

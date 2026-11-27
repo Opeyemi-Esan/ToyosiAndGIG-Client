@@ -7,7 +7,7 @@ import { MusicIcon } from '../../../shared/components/Icons'
 
 export default function ServicesSection() {
   return (
-    <section className="py-16 sm:py-20">
+    <section className="bg-fg/3 py-16 sm:py-20">
       <div className="container-x">
         <SectionHeading animate eyebrow="Services" title="How we can play for you" subtitle="From intimate gatherings to big stages." />
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
